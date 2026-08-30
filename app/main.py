@@ -10,7 +10,9 @@ st.set_page_config(page_title="Tourism Experience Analytics", layout="wide")
 # --- Load Models & Data ---
 @st.cache_resource
 def load_models_and_data():
-    models_dir = "data/processed/models"
+    # Construct an absolute path that works regardless of where Streamlit is executed from
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    models_dir = os.path.join(base_dir, "data", "processed", "models")
     
     # Load Models
     reg_model = joblib.load(os.path.join(models_dir, 'regression_model.pkl'))
@@ -127,11 +129,12 @@ with tab3:
     
     # Load and display images
     try:
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         col1, col2 = st.columns(2)
         with col1:
-            st.image("notebooks/user_distribution_continent.png", caption="User Distribution Across Continents", use_container_width=True)
-            st.image("notebooks/attraction_types_popularity.png", caption="Attraction Types Popularity", use_container_width=True)
+            st.image(os.path.join(base_dir, "notebooks", "user_distribution_continent.png"), caption="User Distribution Across Continents", use_container_width=True)
+            st.image(os.path.join(base_dir, "notebooks", "attraction_types_popularity.png"), caption="Attraction Types Popularity", use_container_width=True)
         with col2:
-            st.image("notebooks/rating_by_visit_mode.png", caption="Rating by Visit Mode", use_container_width=True)
+            st.image(os.path.join(base_dir, "notebooks", "rating_by_visit_mode.png"), caption="Rating by Visit Mode", use_container_width=True)
     except FileNotFoundError:
         st.error("EDA images not found. Please ensure the EDA script ran successfully.")
