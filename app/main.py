@@ -10,7 +10,7 @@ st.set_page_config(page_title="Tourism Experience Analytics", layout="wide")
 # --- Load Models & Data ---
 @st.cache_resource
 def load_models_and_data():
-    models_dir = r"data\processed\models"
+    models_dir = "data/processed/models"
     
     # Load Models
     reg_model = joblib.load(os.path.join(models_dir, 'regression_model.pkl'))
