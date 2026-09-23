@@ -163,7 +163,7 @@ with tab3:
         
         with col1:
             # 1. User Distribution Across Continents
-            continent_counts = eda_df['Continent_x'].value_counts().reset_index()
+            continent_counts = eda_df['Continent'].value_counts().reset_index()
             continent_counts.columns = ['Continent', 'Count']
             fig1 = px.pie(continent_counts, values='Count', names='Continent', 
                           title='User Distribution Across Continents', hole=0.3)
