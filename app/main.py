@@ -88,6 +88,23 @@ with tab1:
                 st.write("**Attraction Name:**", att_info.iloc[0]['Attraction'])
                 st.write("**Type:**", att_info.iloc[0]['AttractionType'])
                 st.write("**Location:**", att_info.iloc[0]['AttractionAddress'])
+                
+            # Model Interpretability
+            st.markdown("---")
+            st.subheader("🔍 Model Interpretability")
+            st.write("Why did the model make this prediction?")
+            
+            # Load feature importances
+            reg_importance = pd.read_csv(os.path.join(models_dir, 'regression_feature_importances.csv'))
+            clf_importance = pd.read_csv(os.path.join(models_dir, 'classification_feature_importances.csv'))
+            
+            interp_col1, interp_col2 = st.columns(2)
+            with interp_col1:
+                st.markdown("**What drives the Visit Mode?**")
+                st.dataframe(clf_importance.head(3), use_container_width=True, hide_index=True)
+            with interp_col2:
+                st.markdown("**What drives the Rating?**")
+                st.dataframe(reg_importance.head(3), use_container_width=True, hide_index=True)
 
 with tab2:
     st.header("Top Recommended Attractions")
