@@ -141,17 +141,53 @@ with tab2:
             st.table(rec_full[['Attraction', 'AttractionType', 'Rating', 'AttractionAddress']])
 
 with tab3:
-    st.header("Exploratory Data Analysis")
-    st.write("Visualizations generated during the data preparation phase.")
+    st.header("Interactive Exploratory Data Analysis")
+    st.write("Explore the data dynamically. Use the tools on the top right of each chart to zoom, pan, or download.")
     
-    # Load and display images
-    try:
+    # Load raw data for EDA
+    @st.cache_data
+    def load_eda_data():
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return pd.read_csv(os.path.join(base_dir, "data", "processed", "merged_data.csv"))
+    
+    try:
+        eda_df = load_eda_data()
+        import plotly.express as px
+        
+        # Add a filter
+        selected_year = st.selectbox("Filter by Visit Year (Optional)", options=["All Time"] + sorted(eda_df['VisitYear'].dropna().unique().tolist()))
+        
+        if selected_year != "All Time":
+            eda_df = eda_df[eda_df['VisitYear'] == selected_year]
+            
         col1, col2 = st.columns(2)
+        
         with col1:
-            st.image(os.path.join(base_dir, "notebooks", "user_distribution_continent.png"), caption="User Distribution Across Continents", use_container_width=True)
-            st.image(os.path.join(base_dir, "notebooks", "attraction_types_popularity.png"), caption="Attraction Types Popularity", use_container_width=True)
+            # 1. User Distribution Across Continents
+            continent_counts = eda_df['Continent_x'].value_counts().reset_index()
+            continent_counts.columns = ['Continent', 'Count']
+            fig1 = px.pie(continent_counts, values='Count', names='Continent', 
+                          title='User Distribution Across Continents', hole=0.3)
+            st.plotly_chart(fig1, use_container_width=True)
+            
+            # 2. Attraction Types Popularity
+            type_counts = eda_df['AttractionType'].value_counts().reset_index()
+            type_counts.columns = ['Attraction Type', 'Visits']
+            fig2 = px.bar(type_counts, x='Attraction Type', y='Visits', 
+                          title='Attraction Types Popularity', color='Visits', color_continuous_scale='Viridis')
+            st.plotly_chart(fig2, use_container_width=True)
+            
         with col2:
-            st.image(os.path.join(base_dir, "notebooks", "rating_by_visit_mode.png"), caption="Rating by Visit Mode", use_container_width=True)
-    except FileNotFoundError:
-        st.error("EDA images not found. Please ensure the EDA script ran successfully.")
+            # 3. Rating by Visit Mode
+            fig3 = px.box(eda_df, x='VisitMode', y='Rating', color='VisitMode',
+                          title='Rating Distribution by Visit Mode')
+            st.plotly_chart(fig3, use_container_width=True)
+            
+            # 4. Rating vs Attraction Type
+            fig4 = px.violin(eda_df, x='AttractionType', y='Rating', box=True,
+                             title='Rating Distribution across Attraction Types')
+            fig4.update_xaxes(tickangle=45)
+            st.plotly_chart(fig4, use_container_width=True)
+            
+    except Exception as e:
+        st.error(f"Could not load interactive charts. Error: {e}")
