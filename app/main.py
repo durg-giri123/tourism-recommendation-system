@@ -7,20 +7,20 @@ import os
 # --- Configurations ---
 st.set_page_config(page_title="Tourism Experience Analytics", layout="wide")
 
+# --- Global Paths ---
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MODELS_DIR = os.path.join(BASE_DIR, "data", "processed", "models")
+
 # --- Load Models & Data ---
 @st.cache_resource
 def load_models_and_data():
-    # Construct an absolute path that works regardless of where Streamlit is executed from
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    models_dir = os.path.join(base_dir, "data", "processed", "models")
-    
     # Load Models
-    reg_model = joblib.load(os.path.join(models_dir, 'regression_model.pkl'))
-    clf_model = joblib.load(os.path.join(models_dir, 'classification_model.pkl'))
+    reg_model = joblib.load(os.path.join(MODELS_DIR, 'regression_model.pkl'))
+    clf_model = joblib.load(os.path.join(MODELS_DIR, 'classification_model.pkl'))
     
     # Load Assets
-    user_item = pd.read_csv(os.path.join(models_dir, 'user_item_matrix.csv'))
-    attractions = pd.read_csv(os.path.join(models_dir, 'attractions.csv'))
+    user_item = pd.read_csv(os.path.join(MODELS_DIR, 'user_item_matrix.csv'))
+    attractions = pd.read_csv(os.path.join(MODELS_DIR, 'attractions.csv'))
     
     # Modes mapping
     # 1: Business, 2: Couples, 3: Family, 4: Friends, 5: Solo (Assumed based on typical modes)
@@ -95,8 +95,8 @@ with tab1:
             st.write("Why did the model make this prediction?")
             
             # Load feature importances
-            reg_importance = pd.read_csv(os.path.join(models_dir, 'regression_feature_importances.csv'))
-            clf_importance = pd.read_csv(os.path.join(models_dir, 'classification_feature_importances.csv'))
+            reg_importance = pd.read_csv(os.path.join(MODELS_DIR, 'regression_feature_importances.csv'))
+            clf_importance = pd.read_csv(os.path.join(MODELS_DIR, 'classification_feature_importances.csv'))
             
             interp_col1, interp_col2 = st.columns(2)
             with interp_col1:
@@ -147,8 +147,7 @@ with tab3:
     # Load raw data for EDA
     @st.cache_data
     def load_eda_data():
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        return pd.read_csv(os.path.join(base_dir, "data", "processed", "merged_data.csv"))
+        return pd.read_csv(os.path.join(BASE_DIR, "data", "processed", "merged_data.csv"))
     
     try:
         eda_df = load_eda_data()
